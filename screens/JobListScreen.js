@@ -5,6 +5,7 @@ import {
   StyleSheet,
   FlatList,
   Pressable,
+  ScrollView,
 } from 'react-native';
 import JobCard from '../components/JobCard';
 import EmptyState from '../components/EmptyState';
@@ -32,17 +33,17 @@ export default function JobListScreen({ jobs, onNewQuote, onOpenJob }) {
         <PrimaryButton title="+ Quote" onPress={onNewQuote} style={styles.newBtn} />
       </View>
 
-      <FlatList
+      <ScrollView
         horizontal
-        data={filters}
-        keyExtractor={(item) => item}
         showsHorizontalScrollIndicator={false}
         style={styles.filterList}
         contentContainerStyle={styles.filterContent}
-        renderItem={({ item }) => {
+      >
+        {filters.map((item) => {
           const active = item === filter;
           return (
             <Pressable
+              key={item}
               onPress={() => setFilter(item)}
               style={[styles.chip, active && styles.chipActive]}
             >
@@ -51,8 +52,8 @@ export default function JobListScreen({ jobs, onNewQuote, onOpenJob }) {
               </Text>
             </Pressable>
           );
-        }}
-      />
+        })}
+      </ScrollView>
 
       <FlatList
         data={filtered}

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   StatusBar,
@@ -34,15 +34,22 @@ export default function App() {
     };
   }, []);
 
+  const jobsRef = useRef(jobs);
+  jobsRef.current = jobs;
+
   const persist = useCallback(async (nextJobs) => {
     setJobs(nextJobs);
-    await saveJobs(nextJobs);
+    try {
+      await saveJobs(nextJobs);
+    } catch (e) {
+      console.warn('Failed to persist jobs', e);
+    }
   }, []);
 
   const handleSaveQuote = async (payload) => {
     const q = computeQuote(payload);
     const job = {
-      id: Date.now().toString(),
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       name: payload.name,
       materialCost: q.material,
       laborHours: q.hours,
@@ -53,17 +60,17 @@ export default function App() {
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
-    await persist([job, ...jobs]);
+    await persist([job, ...jobsRef.current]);
     setScreen('list');
   };
 
   const handleUpdateJob = async (updated) => {
-    const next = jobs.map((j) => (j.id === updated.id ? updated : j));
+    const next = jobsRef.current.map((j) => (j.id === updated.id ? updated : j));
     await persist(next);
   };
 
   const handleDeleteJob = async (id) => {
-    const next = jobs.filter((j) => j.id !== id);
+    const next = jobsRef.current.filter((j) => j.id !== id);
     await persist(next);
     setSelectedId(null);
     setScreen('list');
@@ -71,62 +78,61 @@ export default function App() {
 
   const selectedJob = jobs.find((j) => j.id === selectedId);
 
+  const openJob = (id) => {
+    setSelectedId(id);
+    setScreen('detail');
+  };
+
   if (!ready) {
     return (
       <SafeAreaProvider>
-      <SafeAreaView style={styles.safe}>
-        <StatusBar barStyle="light-content" backgroundColor={colors.bg} />
-        <View style={styles.loading}>
-          <ActivityIndicator size="large" color={colors.accent} />
-          <Text style={styles.loadingText}>Loading shop jobs…</Text>
-        </View>
-      </SafeAreaView>
+        <SafeAreaView style={styles.safe}>
+          <StatusBar barStyle="light-content" backgroundColor={colors.bg} />
+          <View style={styles.loading}>
+            <ActivityIndicator size="large" color={colors.accent} />
+            <Text style={styles.loadingText}>Loading shop jobs…</Text>
+          </View>
+        </SafeAreaView>
       </SafeAreaProvider>
     );
   }
 
   return (
     <SafeAreaProvider>
-    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right', 'bottom']}>
-      <StatusBar barStyle="light-content" backgroundColor={colors.bg} />
-      {screen === 'list' && (
-        <JobListScreen
-          jobs={jobs}
-          onNewQuote={() => setScreen('quote')}
-          onOpenJob={(id) => {
-            setSelectedId(id);
-            setScreen('detail');
-          }}
-        />
-      )}
-      {screen === 'quote' && (
-        <QuoteScreen
-          onCancel={() => setScreen('list')}
-          onSave={handleSaveQuote}
-        />
-      )}
-      {screen === 'detail' && selectedJob && (
-        <JobDetailScreen
-          job={selectedJob}
-          onBack={() => {
-            setSelectedId(null);
-            setScreen('list');
-          }}
-          onUpdate={handleUpdateJob}
-          onDelete={handleDeleteJob}
-        />
-      )}
-      {screen === 'detail' && !selectedJob && (
-        <JobListScreen
-          jobs={jobs}
-          onNewQuote={() => setScreen('quote')}
-          onOpenJob={(id) => {
-            setSelectedId(id);
-            setScreen('detail');
-          }}
-        />
-      )}
-    </SafeAreaView>
+      <SafeAreaView style={styles.safe} edges={['top', 'left', 'right', 'bottom']}>
+        <StatusBar barStyle="light-content" backgroundColor={colors.bg} />
+        {screen === 'list' && (
+          <JobListScreen
+            jobs={jobs}
+            onNewQuote={() => setScreen('quote')}
+            onOpenJob={openJob}
+          />
+        )}
+        {screen === 'quote' && (
+          <QuoteScreen
+            onCancel={() => setScreen('list')}
+            onSave={handleSaveQuote}
+          />
+        )}
+        {screen === 'detail' && selectedJob && (
+          <JobDetailScreen
+            job={selectedJob}
+            onBack={() => {
+              setSelectedId(null);
+              setScreen('list');
+            }}
+            onUpdate={handleUpdateJob}
+            onDelete={handleDeleteJob}
+          />
+        )}
+        {screen === 'detail' && !selectedJob && (
+          <JobListScreen
+            jobs={jobs}
+            onNewQuote={() => setScreen('quote')}
+            onOpenJob={openJob}
+          />
+        )}
+      </SafeAreaView>
     </SafeAreaProvider>
   );
 }

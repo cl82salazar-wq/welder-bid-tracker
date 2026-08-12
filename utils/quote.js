@@ -1,4 +1,5 @@
 export function toNumber(value, fallback = 0) {
+  if (value == null || value === '') return fallback;
   const n = parseFloat(String(value).replace(/,/g, ''));
   return Number.isFinite(n) ? n : fallback;
 }

@@ -52,7 +52,7 @@ export default function JobDetailScreen({ job, onBack, onUpdate, onDelete }) {
 
   const handleSave = () => {
     if (!name.trim()) {
-      Alert.alert('Job name required');
+      Alert.alert('Job name required', 'Enter a job name before saving.');
       return;
     }
     persist();

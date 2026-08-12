@@ -7,7 +7,11 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "ci:check": "node scripts/syntax-check.js",
     "postinstall": "node scripts/patch-expo-windows.js"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "1.18.2",

@@ -19,6 +19,5 @@ export async function saveJobs(jobs) {
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(jobs));
   } catch (e) {
     console.warn('Failed to save jobs', e);
-    throw e;
   }
 }
