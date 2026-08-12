@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "Welder Bid Tracker",
+    "slug": "welder-bid-tracker",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#0F1419"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.cl82salazar.welderbidtracker"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0F1419"
+      },
+      "package": "com.cl82salazar.welderbidtracker"
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
