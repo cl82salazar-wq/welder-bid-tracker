@@ -1,9 +1,9 @@
 name: CI
 
 on:
-  push:
-    branches: [main, feature/welder-mvp]
   pull_request:
+  push:
+    branches: [main]
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
